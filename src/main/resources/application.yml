@@ -1,0 +1,51 @@
+spring:
+  application:
+    name: custom-quartz-scheduling
+  liquibase:
+    enabled: true
+    changelog: classpath:/db/changelog/db.changelog-master.xml
+  h2:
+    console:
+      enabled: true
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password: password
+    hikari:
+      poolName: Hikari
+      auto-commit: false
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+  quartz:
+    jdbc:
+      initialize-schema: "never"
+    job-store-type: "jdbc"
+    overwrite-existing-jobs: true
+    properties:
+      org.quartz.threadPool.threadCount: 10
+      org.quartz.scheduler.instanceName: ${spring.application.name}
+      org.quartz.scheduler.instanceId: AUTO
+      org.quartz.jobStore.class: org.quartz.impl.jdbcjobstore.JobStoreTX
+      org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+      org.quartz.jobStore.misfireThreshold: 60000
+      org.quartz.jobStore.isClustered: true
+      org.quartz.plugin.shutdownHook.class: org.quartz.plugins.management.ShutdownHookPlugin
+      org.quartz.plugin.shutdownHook.cleanShutdown: true
+      org.quartz.jobStore.lockHandler.class: fr.syalioune.dds.quartz.scheduling.quartz.ZookeeperSemaphore
+      org.quartz.jobStore.lockHandler.zookeeperConnectString: localhost:2181
+      org.quartz.jobStore.lockHandler.zookeeperLockPath: /quartz/leader
+      org.quartz.jobStore.lockHandler.zookeeperAuthScheme: tbd
+      org.quartz.jobStore.lockHandler.zookeeperAuthDigest: tbd
+      org.quartz.jobStore.lockHandler.zookeeperRetryMs: 100
+      org.quartz.jobStore.lockHandler.nodeId: ${server.port}
+      org.quartz.jobStore.lockHandler.leadershipPeriodMs: 120000
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  metrics:
+    tags:
+      app: ${spring.application.name}
+      instance: ${server.port}

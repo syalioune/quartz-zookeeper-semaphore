@@ -1,0 +1,14 @@
+spring:
+  h2:
+    console:
+      enabled: false
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:postgresql://localhost:49153/postgres
+    username: postgres
+    password: mysecretpassword
+    hikari:
+      poolName: Hikari
+      auto-commit: false
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
