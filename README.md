@@ -6,7 +6,7 @@ The purpose of this repository is to implement a [Quartz Scheduler](http://www.q
 Use case
 ---
 
-Quartz scheduler offer cluster aware job scheduling through the usage of RDBMS locks. This can lead to performance issues depending on the workload as described in Quartz documentation :
+Quartz scheduler offer cluster aware job scheduling through the usage of RDBMS locks. This can lead to performance issues depending on the workload as described in [Quartz documentation](http://www.quartz-scheduler.org/documentation/quartz-2.3.0/configuration/ConfigJDBCJobStoreClustering.html) :
 
 > the clustering feature works best for scaling out long-running and/or cpu-intensive jobs (distributing the work-load over multiple nodes). If you need to scale out to support thousands of short-running (e.g 1 second) jobs, consider partitioning the set of jobs by using multiple distinct schedulers (including multiple clustered schedulers for HA). The scheduler makes use of a cluster-wide lock, a pattern that degrades performance as you add more nodes (when going beyond about three nodes - depending upon your database’s capabilities, etc.).
 
@@ -47,7 +47,7 @@ org.quartz.jobStore.lockHandler.zookeeperAuthUsername: tbd
 org.quartz.jobStore.lockHandler.zookeeperAuthPassword: tbd
 org.quartz.jobStore.lockHandler.zookeeperAuthScheme: tbd
 org.quartz.jobStore.lockHandler.zookeeperRetryMs: 100
-org.quartz.jobStore.lockHandler.nodeId: ${server.port}
+org.quartz.jobStore.lockHandler.nodeId: ${NODE_ID}
 org.quartz.jobStore.lockHandler.leadershipPeriodMs: 120000
 ```
 
@@ -80,8 +80,8 @@ Follow the steps below to use it.
 mvn clean install
 cd spring-demo-application
 java -Dspring.profiles.active=postgres -Dserver.port=8080 -jar target/spring-demo-application-<version>.jar
-java -Dspring.profiles.active=postgres -Dserver.port=8080 -jar target/spring-demo-application-<version>.jar
-java -Dspring.profiles.active=postgres -Dserver.port=8080 -jar target/spring-demo-application-<version>.jar
+java -Dspring.profiles.active=postgres -Dserver.port=8081 -jar target/spring-demo-application-<version>.jar
+java -Dspring.profiles.active=postgres -Dserver.port=8082 -jar target/spring-demo-application-<version>.jar
 ```
 
 ## Docker-compose
