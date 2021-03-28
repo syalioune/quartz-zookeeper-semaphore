@@ -25,4 +25,4 @@ jobs:
     - name: Build Docker image
       env:
         DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
-      run: mvn -Ddocker.hub.token=${DOCKER_HUB_TOKEN} spring-boot:build-image
+      run: mvn -DskipTests -Ddocker.hub.token=${DOCKER_HUB_TOKEN} spring-boot:build-image
