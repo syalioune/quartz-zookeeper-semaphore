@@ -1,0 +1,65 @@
+@startuml
+
+control Quartz
+control ZookeeperSemaphore
+control RenewalThread
+control Zookeeper
+
+group initialization
+
+Quartz -> ZookeeperSemaphore: Instantiate
+ZookeeperSemaphore -> RenewalThread: Instantiate & Schedule at fix rate
+Quartz -> ZookeeperSemaphore: Set properties through setters
+RenewalThread -> Zookeeper: Create Zk session and LeaderLatch
+
+end
+
+group run
+
+Quartz -> ZookeeperSemaphore: obtainLock
+
+group only done once
+  ZookeeperSemaphore -> ZookeeperSemaphore: wait thread init completion
+
+  RenewalThread -> ZookeeperSemaphore: notify init complete
+end
+
+ZookeeperSemaphore -> ZookeeperSemaphore: waiting for leadership
+
+loop
+  RenewalThread -> Zookeeper: get participants
+
+  RenewalThread -> RenewalThread:Am I the leader ?
+
+  alt I am not the leader
+
+    RenewalThread -> ZookeeperSemaphore: disableLeadership()
+
+  else I am the leader
+
+    RenewalThread -> RenewalThread: Has Latch expired ?
+
+    alt Latch has expired
+
+      RenewalThread -> ZookeeperSemaphore: disableLeadership()
+
+      RenewalThread -> Zookeeper: recreate session & leader latch
+
+    else Latch has not expired
+
+      RenewalThread -> ZookeeperSemaphore: enableLeadership()
+
+    end
+
+  end
+end
+
+ZookeeperSemaphore -> Quartz: return true
+
+Quartz -> ZookeeperSemaphore: releaseLock
+
+ZookeeperSemaphore -> ZookeeperSemaphore: Do nothing
+
+end
+
+@enduml

@@ -2,87 +2,86 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.4.3</version>
-		<relativePath/> <!-- lookup parent from repository -->
-	</parent>
-	<groupId>fr.syalioune.dds</groupId>
-	<artifactId>quartz-scheduling</artifactId>
+	<packaging>pom</packaging>
+	<modules>
+		<module>quartz-zookeeper-semaphore</module>
+		<module>spring-demo-application</module>
+	</modules>
+	<groupId>fr.syalioune.scheduling</groupId>
+	<artifactId>quartz-zookeeper</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>quartz-scheduling</name>
-	<description>Demo project for Spring Boot</description>
+	<name>quartz-zookeeper</name>
+	<description>Quartz semaphore implementation using Zookeeper</description>
 	<properties>
 		<java.version>11</java.version>
+		<spring-boot.version>2.4.3</spring-boot.version>
 		<curator.version>5.1.0</curator.version>
+		<junit.version>5.7.1</junit.version>
+		<mockito.version>1.10.19</mockito.version>
+		<quartz.version>2.3.2</quartz.version>
+		<image.name>syalioune/${project.parent.artifactId}:${project.version}</image.name>
+		<image.push>true</image.push>
+		<docker.hub.token>OVERRIDEN</docker.hub.token>
 	</properties>
-	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-quartz</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-jdbc</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.liquibase</groupId>
-			<artifactId>liquibase-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.zaxxer</groupId>
-			<artifactId>HikariCP</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.micrometer</groupId>
-			<artifactId>micrometer-registry-prometheus</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.curator</groupId>
-			<artifactId>curator-framework</artifactId>
-			<version>${curator.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.curator</groupId>
-			<artifactId>curator-recipes</artifactId>
-			<version>${curator.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.curator</groupId>
-			<artifactId>curator-framework</artifactId>
-			<version>${curator.version}</version>
-		</dependency>
-	</dependencies>
-
 	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.8.1</version>
+					<configuration>
+						<source>1.8</source>
+						<target>1.8</target>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-maven-plugin</artifactId>
+					<version>${spring-boot.version}</version>
+					<configuration>
+						<image>
+							<name>${image.name}</name>
+							<pullPolicy>IF_NOT_PRESENT</pullPolicy>
+							<publish>${image.push}</publish>
+						</image>
+						<docker>
+							<publishRegistry>
+								<username>syalioune</username>
+								<password>${docker.hub.token}</password>
+								<url>https://docker.example.com/v1/</url>
+								<email>sy_alioune@yahoo.fr</email>
+							</publishRegistry>
+						</docker>
+						<excludes>
+							<exclude>
+								<groupId>org.projectlombok</groupId>
+								<artifactId>lombok</artifactId>
+							</exclude>
+						</excludes>
+					</configuration>
+					<executions>
+						<execution>
+							<id>build-info</id>
+							<goals>
+								<!-- Generation of build.properties -->
+								<goal>build-info</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>repackage</id>
+							<goals>
+								<goal>repackage</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.22.0</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
-
 </project>
